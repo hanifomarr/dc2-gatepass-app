@@ -1,20 +1,36 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-interface AuthState {
-  userInfo: string | null;
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+  token: string;
+  role?: string;
 }
 
-const storedUserInfo = localStorage.getItem("userInfo");
+interface AuthState {
+  userInfo: User | null;
+}
+
+const getStoredUser = (): User | null => {
+  try {
+    const stored = localStorage.getItem("userInfo");
+    return stored ? JSON.parse(stored) : null;
+  } catch (error) {
+    console.error("Failed to parse stored user info", error);
+    return null;
+  }
+};
 
 const initialState: AuthState = {
-  userInfo: storedUserInfo ? JSON.parse(storedUserInfo) : null,
+  userInfo: getStoredUser(),
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    login: (state, action: PayloadAction<string>) => {
+    login: (state, action: PayloadAction<User>) => {
       state.userInfo = action.payload;
       localStorage.setItem("userInfo", JSON.stringify(action.payload));
     },
